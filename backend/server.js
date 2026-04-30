@@ -3,78 +3,93 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Load environment variables
+// Load env variables
 dotenv.config();
 
 const app = express();
 
+// =====================
+// ENV CHECKS
+// =====================
 if (!process.env.MONGODB_URI) {
-  console.error('Missing env var: MONGODB_URI');
+  console.error('❌ Missing MONGODB_URI');
   process.exit(1);
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error('Missing env var: JWT_SECRET');
+  console.error('❌ Missing JWT_SECRET');
   process.exit(1);
 }
 
 // =====================
-// Middleware
+// MIDDLEWARE
 // =====================
 app.use(express.json());
-app.use(cors());
+
+// Allow frontend access
+app.use(cors({
+  origin: '*'
+}));
 
 // =====================
-// MongoDB Connection
+// ROOT ROUTE (FIX "Cannot GET /")
+// =====================
+app.get("/", (req, res) => {
+  res.json({
+    message: "Fraud Detection API is running 🚀",
+    status: "OK"
+  });
+});
+
+// =====================
+// HEALTH CHECK
+// =====================
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "Server is healthy",
+    time: new Date()
+  });
+});
+
+// =====================
+// MONGODB CONNECTION
 // =====================
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('MongoDB connected');
+    console.log("✅ MongoDB connected");
   })
   .catch((err) => {
-    console.log('MongoDB connection error:', err.message);
+    console.error("❌ MongoDB connection error:", err.message);
     process.exit(1);
   });
 
 // =====================
-// Routes Import
+// ROUTES
 // =====================
 const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
 const fraudRoutes = require('./routes/fraud');
 
-// =====================
-// Routes Usage
-// =====================
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/fraud', fraudRoutes);
 
 // =====================
-// Health Check Route
-// =====================
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Server is running',
-  });
-});
-
-// =====================
-// Global Error Handler
+// GLOBAL ERROR HANDLER
 // =====================
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
+  console.error("Server Error:", err);
   res.status(500).json({
-    message: 'Something went wrong on the server',
+    message: "Internal Server Error"
   });
 });
 
 // =====================
-// Server Start
+// START SERVER
 // =====================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
