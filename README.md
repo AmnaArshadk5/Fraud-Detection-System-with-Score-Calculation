@@ -1,225 +1,214 @@
-# Fraud Detection System - Full Stack FinTech Application
+# Fraud Detection System (MERN) — Full Stack FinTech Application
 
-## Project Setup & Installation
+A full-stack MERN app that lets users:
+- Sign up / log in (JWT auth)
+- Add transactions
+- Analyze transactions with a multi-rule fraud risk scoring algorithm (0–100)
+- View fraud alerts, reasons, and update alert status
 
-### Prerequisites
-- Node.js (v14+)
-- MongoDB (local or Atlas cluster)
-- npm or yarn
+---
 
-### Backend Setup
+## Table of Contents
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Quick Start (Local)](#quick-start-local)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Database Design](#database-design)
+- [Core FinTech Logic](#core-fintech-logic)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
 
-1. **Navigate to backend folder:**
-   ```bash
-   cd backend
-   ```
+---
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+## Tech Stack
+- Frontend: React (Create React App), React Router, Axios
+- Backend: Node.js, Express, JWT
+- Database: MongoDB, Mongoose
 
-3. **Setup environment variables:**
-   - Copy `.env.example` to `.env`
-   - Update MongoDB URI and JWT secret:
-   ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/fraud-detection
-   JWT_SECRET=your_secure_jwt_secret_key
-   PORT=5000
-   NODE_ENV=development
-   ```
-
-4. **Start the backend server:**
-   ```bash
-   npm run dev
-   ```
-   Server will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. **Navigate to frontend folder:**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Setup environment variables:**
-   - Copy `.env.example` to `.env`
-   - Set API URL:
-   ```
-   REACT_APP_API_URL=http://localhost:5000/api
-   ```
-
-4. **Start the React app:**
-   ```bash
-   npm start
-   ```
-   App will open at `http://localhost:3000`
-
-## Project Structure
-
-### Backend (`/backend`)
-- **routes/**: API endpoints (auth, transactions, fraud)
-- **models/**: MongoDB schemas (User, Transaction, FraudAlert, RiskProfile)
-- **middleware/**: Authentication & validation
-- **server.js**: Express server entry point
-
-### Frontend (`/frontend`)
-- **pages/**: Login, Signup, Dashboard
-- **components/**: Protected routes, navigation
-- **api.js**: Axios API client
-- **App.js**: React Router setup
+---
 
 ## Features
-
 ### Authentication
-✅ User signup and login with JWT tokens
-✅ Protected routes (frontend + backend)
-✅ Token persistence across page refreshes
-✅ Secure password hashing with bcryptjs
+- Login + Signup pages
+- Protected route for dashboard (unauthenticated users cannot access it)
+- Token persistence across refresh (stored in `localStorage`)
 
-### Database Design (Advanced - 4 Collections)
-✅ **Users**: User accounts with reference to RiskProfile
-✅ **Transactions**: All financial transactions with fraud alert reference
-✅ **FraudAlerts**: Fraud detection results with reasons
-✅ **RiskProfiles**: User risk scores and statistics
+### Backend (REST APIs + Middleware)
+- REST API architecture with routes for auth, transactions, and fraud
+- Middleware:
+  - JWT auth check (`backend/middleware/auth.js`)
+  - Input validation (`backend/middleware/validation.js`)
 
-### Core Logic: Fraud Detection with Score Calculation
-The system implements a multi-rule fraud detection algorithm:
+### Database + Queries
+- Collections:
+  - `User`
+  - `Transaction`
+  - `FraudAlert`
+  - `RiskProfile`
+- Meaningful queries (aggregations):
+  - `GET /api/transactions/high-risk` — groups flagged transactions by category (count/total/avg)
+  - `GET /api/transactions/trends` — daily transaction totals for the last 30 days
 
-1. **Amount-Based Anomaly Detection** (30 points)
-   - Flags transactions >3x average as highly suspicious
-   - Moderate flag for 1.5x-3x average
+### UI / UX
+- Dynamic data fetched from backend (no hardcoded dashboard data)
+- Interactive features:
+  - Add transaction form feedback
+  - Analyze button shows loading + success/error toast
+  - Transactions search/sort + “flagged only” filter
+  - Alert status update dropdown
+- Responsive layout (mobile + desktop)
 
-2. **Unusual Category Detection** (20 points)
-   - Identifies new spending categories for the user
-   - Tracks user spending patterns
+---
 
-3. **Velocity Analysis** (15 points)
-   - Detects multiple transactions within 1 hour
-   - Risk increases with transaction frequency
+## Quick Start (Local)
+### Prerequisites
+- Node.js (14+ recommended)
+- MongoDB (local or Atlas)
+- npm
 
-4. **Location Pattern Analysis** (20 points)
-   - Identifies suspicious geographic locations
-   - Flags previously marked suspicious locations
-
-5. **Fraud History Evaluation** (15 points)
-   - Considers user's historical fraud rate
-   - Higher score if >10% past transactions were fraudulent
-
-### REST API Endpoints
-
-#### Authentication
-- `POST /api/auth/signup` - Create new account
-- `POST /api/auth/login` - User login
-
-#### Transactions
-- `POST /api/transactions` - Add new transaction
-- `GET /api/transactions` - Get all transactions
-- `GET /api/transactions/high-risk` - Query 1: Aggregation (high-risk transactions by category)
-- `GET /api/transactions/trends` - Query 2: Time-based ranking (daily trends)
-
-#### Fraud Detection
-- `POST /api/fraud/analyze` - Analyze transaction for fraud
-- `GET /api/fraud/alerts` - Get all fraud alerts
-- `PUT /api/fraud/alerts/:alertId` - Update alert status
-- `GET /api/fraud/risk-profile` - Get user's risk profile
-
-### Security Implementation
-✅ Input validation on all forms and API endpoints
-✅ Protected routes (JWT authentication required)
-✅ Password hashing with bcryptjs (10 salt rounds)
-✅ CORS configuration for secure cross-origin requests
-✅ Protected API routes - authentication middleware on all endpoints
-
-### Responsiveness
-✅ Mobile-first design with CSS Grid
-✅ Breakpoints for tablet (768px) and desktop (1024px+)
-✅ Touch-friendly buttons and inputs
-✅ Responsive forms and data tables
-
-### User Interactions
-✅ Add transactions with real-time form feedback
-✅ Filter and analyze transactions by risk
-✅ Update alert status with dropdown selection
-✅ View real-time risk profile updates
-✅ Interactive fraud alerts with detailed reasons
-
-## Deployment Instructions
-
-### Deploy Backend (Render.com)
-1. Push code to GitHub
-2. Connect GitHub repo to Render
-3. Set environment variables in Render dashboard
-4. Deploy and get live API URL
-
-### Deploy Frontend (Vercel)
-1. Push code to GitHub
-2. Import project to Vercel
-3. Set `REACT_APP_API_URL` environment variable to deployed backend URL
-4. Deploy and get live app URL
-
-### Database (MongoDB Atlas)
-1. Create cluster on MongoDB Atlas
-2. Whitelist your IP addresses
-3. Get connection URI
-4. Add to backend environment variables
-
-## Testing the Application
-
-1. **Signup**: Create a new account
-2. **Add Transactions**: Add multiple transactions with different amounts and categories
-3. **Analyze**: Click "Analyze" to trigger fraud detection
-4. **View Results**: Check fraud alerts with risk scores and reasons
-5. **Update Status**: Change alert status (cleared, confirmed, etc.)
-
-## Database Query Examples
-
-### Query 1: High-Risk Transactions (Aggregation)
-```
-GET /api/transactions/high-risk
-Returns: Categories with flagged transactions, count, total and average amounts
-Purpose: Analyze spending patterns in risky categories
+### 1) Backend
+```bash
+cd backend
+npm install
 ```
 
-### Query 2: Transaction Trends (Time-based Ranking)
-```
-GET /api/transactions/trends
-Returns: Daily transaction counts and amounts for last 30 days
-Purpose: Identify unusual transaction frequency over time
+Create `.env` from the template and update values:
+```bash
+copy .env.example .env
 ```
 
-## Marking Criteria (Part A - 55 marks)
+Run the server:
+```bash
+npm run dev
+```
+Backend runs on `http://localhost:5000` (default).
 
-- ✅ **Authentication (8/8)**: Login, signup, protected routes, token persistence
-- ✅ **Database Design (14/14)**: 4 collections with relationships, queries, indexing
-- ✅ **Core Logic (15/15)**: Fraud detection + scoring algorithm fully implemented
-- ✅ **Backend (8/8)**: REST APIs, middleware, validation, authentication
-- ✅ **Frontend (6/6)**: 3+ pages, React Router, dynamic data, navigation
-- ✅ **Security (4/4)**: Input validation, protected routes, password hashing
-- ✅ **Responsiveness**: Mobile-friendly design
-- ✅ **User Interactions**: Form feedback, filters, alerts, real-time updates
+### 2) Frontend
+```bash
+cd frontend
+npm install
+```
+
+Create `.env` from the template:
+```bash
+copy .env.example .env
+```
+
+Run the app:
+```bash
+npm start
+```
+Frontend runs on `http://localhost:3000` (default).
+
+---
+
+## Environment Variables
+### Backend (`backend/.env`)
+```env
+MONGODB_URI=mongodb://localhost:27017/fraud-detection
+JWT_SECRET=replace_with_a_long_random_secret
+PORT=5000
+NODE_ENV=development
+```
+
+### Frontend (`frontend/.env`)
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+---
+
+## API Endpoints
+Base URL: `http://localhost:5000/api`
+
+### Auth
+- `POST /auth/signup`
+- `POST /auth/login`
+
+### Transactions
+- `POST /transactions` — create a transaction
+- `GET /transactions` — list user transactions
+- `GET /transactions/high-risk` — aggregation query
+- `GET /transactions/trends` — aggregation query
+
+### Fraud
+- `POST /fraud/analyze` — analyze a transaction and create a fraud alert
+- `GET /fraud/alerts` — list alerts
+- `PUT /fraud/alerts/:alertId` — update alert status
+- `GET /fraud/risk-profile` — get user risk profile
+
+---
+
+## Database Design
+Relationships (referencing):
+- `Transaction.userId` → `User`
+- `FraudAlert.userId` → `User`
+- `FraudAlert.transaction` → `Transaction`
+- `Transaction.fraudAlert` → `FraudAlert`
+- `RiskProfile.userId` → `User`
+- `User.riskProfile` → `RiskProfile`
+
+Why referencing (instead of embedding):
+- Transactions and fraud alerts can grow very large; embedding them inside `User` would bloat user documents.
+- Referencing enables efficient filtering and aggregation queries on `transactions` and `fraudalerts`.
+- Alerts/transactions can be updated independently (e.g., alert status changes) without rewriting a large embedded document.
+
+---
+
+## Core FinTech Logic
+Risk score calculation is implemented in `backend/routes/fraud.js`:
+- `calculateRiskScore(...)` computes a capped 0–100 score and `reasons[]` using rules:
+  - Amount anomaly (vs user average)
+  - Category anomaly (rare/new category)
+  - Velocity (multiple transactions in last hour)
+  - Location risk (if configured)
+  - Fraud history rate
+
+The endpoint `POST /api/fraud/analyze`:
+1) Validates JWT and inputs
+2) Loads the transaction + user history
+3) Calculates the score/severity
+4) Saves a `FraudAlert`
+5) Updates `Transaction.isFlagged` and the user `RiskProfile`
+
+---
+
+## Project Structure
+### Backend (`/backend`)
+- `routes/` — `auth.js`, `transactions.js`, `fraud.js`
+- `models/` — `User.js`, `Transaction.js`, `FraudAlert.js`, `RiskProfile.js`
+- `middleware/` — `auth.js`, `validation.js`
+- `server.js`
+
+### Frontend (`/frontend`)
+- `src/pages/` — `Login.js`, `Signup.js`, `Dashboard.js`
+- `src/components/` — `ProtectedRoute.js`
+- `src/api.js`
+
+---
 
 ## Troubleshooting
+### Frontend: “Module not found … node_modules …”
+Reinstall dependencies:
+```bash
+cd frontend
+npm install
+npm start
+```
 
-**Backend won't start:**
-- Ensure MongoDB is running
-- Check PORT 5000 is available
-- Verify .env file has correct MongoDB URI
+### Frontend: “Something is already running on port 3000”
+Either stop the other process, or run on a different port:
+```powershell
+$env:PORT=3002; npm start
+```
 
-**Frontend can't connect to backend:**
-- Ensure backend is running on port 5000
-- Check REACT_APP_API_URL in .env
-- Verify CORS is enabled in server.js
-
-**MongoDB connection error:**
-- Check connection string format
-- Verify IP whitelist on MongoDB Atlas
-- Ensure network connectivity
-
-## Contact & Support
-For issues or questions, refer to the technical report (Part B).
+### Backend exits on startup
+Backend requires `MONGODB_URI` and `JWT_SECRET`.
+- Copy `backend/.env.example` → `backend/.env`
+- Set values, then:
+```bash
+cd backend
+npm install
+npm run dev
+```
