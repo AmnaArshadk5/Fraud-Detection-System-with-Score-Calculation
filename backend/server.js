@@ -17,13 +17,8 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 app.use(express.json());
 
-<<<<<<< Updated upstream
 app.use(cors({
   origin: '*'
 }));
@@ -45,9 +40,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-=======
->>>>>>> Stashed changes
-
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
@@ -62,23 +54,9 @@ const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
 const fraudRoutes = require('./routes/fraud');
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/fraud', fraudRoutes);
-
-<<<<<<< Updated upstream
-=======
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Server is running',
-  });
-});
->>>>>>> Stashed changes
 
 app.use((err, req, res, next) => {
   console.error("Server Error:", err);
@@ -87,10 +65,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
